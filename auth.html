@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AgroAURA Phone Login</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<style>
+body{
+height:100vh;display:flex;justify-content:center;align-items:center;
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+font-family:Segoe UI;color:white;margin:0;
+}
+
+.card{
+width:360px;padding:30px;border-radius:18px;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(18px);
+box-shadow:0 15px 40px rgba(0,0,0,0.6);
+text-align:center;
+}
+
+input{
+width:100%;padding:12px;margin:10px 0;border:none;border-radius:10px;
+}
+
+button{
+width:100%;padding:12px;margin-top:10px;border:none;border-radius:10px;
+background:linear-gradient(45deg,#ff9800,#ff5722);
+color:white;font-weight:bold;cursor:pointer;
+}
+
+.hidden{display:none}
+#msg{margin-top:12px}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>🌾 AgroAURA Login</h2>
+
+<!-- STEP 1 USERNAME -->
+<div id="step1">
+<input id="username" placeholder="Enter Username">
+<button onclick="findUser()">Continue</button>
+</div>
+
+<!-- STEP 2 SEND OTP -->
+<div id="step2" class="hidden">
+<p id="phoneText"></p>
+<div id="recaptcha-container"></div>
+<button onclick="sendOTP()">Send OTP</button>
+</div>
+
+<!-- STEP 3 VERIFY -->
+<div id="step3" class="hidden">
+<input id="otp" placeholder="Enter OTP">
+<button onclick="verifyOTP()">Verify & Login</button>
+</div>
+
+<p id="msg"></p>
+
+</div>
+
+<script>
+const firebaseConfig={
+apiKey:"AIzaSyADL0vGA5WzGc_hHucC5uhsU9Xpng6zdfs",
+authDomain:"loginagroaura.firebaseapp.com",
+projectId:"loginagroaura",
+storageBucket:"loginagroaura.firebasestorage.app",
+messagingSenderId:"47452105409",
+appId:"1:47452105409:web:b01cabaa58100b45444240"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+const db=firebase.firestore();
+
+let userPhone="";
+let confirmationResult=null;
+
+/* STEP 1: FIND USERNAME */
+async function findUser(){
+const uname=document.getElementById("username").value.trim();
+if(!uname){msg.innerText="Enter username";return;}
+
+const snap=await db.collection("users").where("username","==",uname).get();
+
+if(snap.empty){
+msg.innerText="User not found";
+return;
+}
+
+userPhone=snap.docs[0].data().phone;
+document.getElementById("phoneText").innerText="OTP will be sent to "+userPhone;
+
+step1.classList.add("hidden");
+step2.classList.remove("hidden");
+
+/* Recaptcha */
+window.recaptchaVerifier=new firebase.auth.RecaptchaVerifier(
+"recaptcha-container",
+{size:"normal"},
+auth
+);
+}
+
+/* STEP 2: SEND OTP */
+function sendOTP(){
+auth.signInWithPhoneNumber(userPhone,window.recaptchaVerifier)
+.then(res=>{
+confirmationResult=res;
+msg.innerText="OTP Sent!";
+step2.classList.add("hidden");
+step3.classList.remove("hidden");
+})
+.catch(err=>msg.innerText=err.message);
+}
+
+/* STEP 3: VERIFY OTP */
+function verifyOTP(){
+const code=document.getElementById("otp").value;
+
+confirmationResult.confirm(code)
+.then(result=>{
+msg.innerText="Login success!";
+setTimeout(()=>{
+window.location.href="http://localhost:8502";
+},1000);
+})
+.catch(()=>msg.innerText="Invalid OTP");
+}
+</script>
+
+</body>
+</html>

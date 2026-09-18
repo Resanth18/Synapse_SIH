@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Verify OTP</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+<h2>Enter OTP</h2>
+<input id="otp">
+<button onclick="verify()">Verify</button>
+
+<script>
+const firebaseConfig={
+apiKey:"AIzaSyADL0vGA5WzGc_hHucC5uhsU9Xpng6zdfs",
+authDomain:"loginagroaura.firebaseapp.com",
+projectId:"loginagroaura"
+};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+
+const confirmationResult=window.opener?.confirmationResult||window.confirmationResult;
+
+function verify(){
+confirmationResult.confirm(otp.value)
+.then(()=>location.href="http://localhost:8501")
+.catch(()=>alert("Invalid OTP"));
+}
+</script>
+</body>
+</html>

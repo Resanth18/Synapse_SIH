@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AgroAURA Auth</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+    margin:0;
+    font-family:Segoe UI;
+    background:linear-gradient(120deg,#0f2027,#203a43,#2c5364);
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:white;
+}
+
+.container{
+    width:900px;
+    height:520px;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(20px);
+    border-radius:18px;
+    display:flex;
+    box-shadow:0 20px 50px rgba(0,0,0,.5);
+    overflow:hidden;
+}
+
+.left{
+    flex:1;
+    padding:40px;
+    background:linear-gradient(135deg,#00c853,#009688);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+.left h1{
+    font-size:40px;
+    margin:0;
+}
+
+.left p{
+    opacity:.9;
+}
+
+.right{
+    flex:1;
+    padding:40px;
+    background:#ffffff10;
+}
+
+.tabs{
+    display:flex;
+    margin-bottom:20px;
+}
+
+.tab{
+    flex:1;
+    padding:12px;
+    text-align:center;
+    cursor:pointer;
+    background:#ffffff20;
+}
+
+.tab.active{
+    background:#00e676;
+    color:black;
+    font-weight:bold;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin:8px 0;
+    border-radius:8px;
+    border:none;
+    outline:none;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    margin-top:10px;
+    border:none;
+    border-radius:8px;
+    background:#00e676;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:hover{ background:#00c853; }
+
+.msg{
+    margin-top:10px;
+    text-align:center;
+    font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="left">
+    <h1>AgroAURA 🌾</h1>
+    <p>Cultivating the Future with AI</p>
+</div>
+
+<div class="right">
+
+<div class="tabs">
+    <div class="tab active" onclick="showLogin()">Login</div>
+    <div class="tab" onclick="showSignup()">Signup</div>
+</div>
+
+<!-- LOGIN -->
+<div id="loginBox">
+    <input id="loginPhone" placeholder="Phone Number">
+    <input id="loginPass" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+</div>
+
+<!-- SIGNUP -->
+<div id="signupBox" style="display:none">
+    <input id="name" placeholder="Username">
+    <input id="location" placeholder="Location">
+    <input id="phone" placeholder="Phone Number">
+    <input id="email" placeholder="Email">
+    <input id="pass" type="password" placeholder="Password">
+    <input id="cpass" type="password" placeholder="Confirm Password">
+    <button onclick="signup()">Create Account</button>
+</div>
+
+<div class="msg" id="msg"></div>
+
+</div>
+</div>
+
+<script>
+
+function showSignup(){
+    signupBox.style.display="block";
+    loginBox.style.display="none";
+    document.querySelectorAll(".tab")[1].classList.add("active");
+    document.querySelectorAll(".tab")[0].classList.remove("active");
+}
+
+function showLogin(){
+    signupBox.style.display="none";
+    loginBox.style.display="block";
+    document.querySelectorAll(".tab")[0].classList.add("active");
+    document.querySelectorAll(".tab")[1].classList.remove("active");
+}
+
+/* PASSWORD VALIDATION */
+function strongPass(p){
+return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(p);
+}
+
+/* SIGNUP */
+function signup(){
+
+let name = document.getElementById("name").value;
+let loc = document.getElementById("location").value;
+let phone = document.getElementById("phone").value;
+let email = document.getElementById("email").value;
+let pass = document.getElementById("pass").value;
+let cpass = document.getElementById("cpass").value;
+
+if(!strongPass(pass)){
+msg.innerHTML="Password must contain upper, lower, number & symbol (8+)";
+return;
+}
+
+if(pass!==cpass){
+msg.innerHTML="Passwords do not match";
+return;
+}
+
+let user = {
+name:name,
+location:loc,
+phone:phone,
+email:email,
+pass:pass
+};
+
+localStorage.setItem("user_"+phone,JSON.stringify(user));
+msg.innerHTML="Account Created! You can login now";
+showLogin();
+}
+
+/* LOGIN */
+function login(){
+
+let phone=document.getElementById("loginPhone").value;
+let pass=document.getElementById("loginPass").value;
+
+let data=localStorage.getItem("user_"+phone);
+
+if(!data){
+msg.innerHTML="User not found. Please signup";
+return;
+}
+
+let user=JSON.parse(data);
+
+if(user.pass!==pass){
+msg.innerHTML="Wrong password";
+return;
+}
+
+msg.innerHTML="Login Success! Redirecting...";
+setTimeout(()=>{
+window.location.href="http://localhost:8501";
+},1000);
+
+}
+
+</script>
+
+</body>
+</html>

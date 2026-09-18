@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AgroAURA Secure Login</title>
+
+<style>
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+font-family:Segoe UI;
+color:white;
+margin:0;
+}
+
+.card{
+width:380px;
+padding:35px;
+border-radius:20px;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(18px);
+box-shadow:0 15px 40px rgba(0,0,0,0.6);
+text-align:center;
+}
+
+h2{margin-bottom:25px}
+
+input{
+width:100%;
+padding:14px;
+margin:10px 0;
+border:none;
+border-radius:10px;
+font-size:15px;
+outline:none;
+}
+
+button{
+width:100%;
+padding:14px;
+margin-top:12px;
+border:none;
+border-radius:10px;
+background:linear-gradient(45deg,#ff9800,#ff5722);
+color:white;
+font-weight:bold;
+font-size:16px;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{transform:scale(1.03)}
+
+#otpBox{display:none}
+#msg{margin-top:15px;color:#ffd27f}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+<h2>🌾 AgroAURA Login</h2>
+
+<input id="phone" placeholder="+91XXXXXXXXXX">
+<button onclick="sendOTP()">Send WhatsApp OTP</button>
+
+<div id="otpBox">
+<input id="otp" placeholder="Enter OTP">
+<button onclick="verifyOTP()">Verify & Enter</button>
+</div>
+
+<p id="msg"></p>
+</div>
+
+<script>
+async function sendOTP(){
+let phone=document.getElementById("phone").value;
+
+let r=await fetch("http://127.0.0.1:8000/send-otp",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({phone})
+});
+
+let d=await r.json();
+
+if(d.status=="sent"){
+document.getElementById("otpBox").style.display="block";
+msg.innerText="OTP sent to WhatsApp ✔";
+}else{
+msg.innerText="Failed to send OTP";
+}
+}
+
+async function verifyOTP(){
+let phone=document.getElementById("phone").value;
+let otp=document.getElementById("otp").value;
+
+let r=await fetch("http://127.0.0.1:8000/verify",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({phone,otp})
+});
+
+let d=await r.json();
+
+if(d.status=="new"){
+msg.innerText="Welcome new farmer 🌱";
+setTimeout(()=>location.href="http://localhost:8502",1000);
+}
+else if(d.status=="existing"){
+msg.innerText="Welcome back 🌾";
+setTimeout(()=>location.href="http://localhost:8502",1000);
+}
+else{
+msg.innerText="Wrong OTP ❌";
+}
+}
+</script>
+
+</body>
+</html>

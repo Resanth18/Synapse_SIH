@@ -1,0 +1,37 @@
+<!-- signup.html -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Signup</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<h2>Register</h2>
+<input id="username" placeholder="Username"><br>
+<input id="phone" placeholder="+91XXXXXXXXXX"><br>
+<input id="location" placeholder="Location"><br>
+<button onclick="register()">Signup</button>
+
+<script>
+const firebaseConfig={
+apiKey:"AIzaSyADL0vGA5WzGc_hHucC5uhsU9Xpng6zdfs",
+authDomain:"loginagroaura.firebaseapp.com",
+projectId:"loginagroaura"
+};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.firestore();
+
+async function register(){
+await db.collection("users").add({
+username:username.value,
+phone:phone.value,
+location:location.value
+});
+alert("Registered! Go to login page");
+}
+</script>
+</body>
+</html>
